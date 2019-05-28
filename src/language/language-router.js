@@ -9,7 +9,7 @@ languageRouter
   .use(async (req, res, next) => {
     try {
       const language = await LanguageService.getUsersLanguage(
-        req.app.get('db'),
+        req.app.get('db'), // uses req.user.id to get the user's language from language table
         req.user.id,
       )
 
@@ -29,8 +29,8 @@ languageRouter
   .get('/', async (req, res, next) => {
     try {
       const words = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id,
+        req.app.get('db'), // uses language.id to get the items from word table
+        req.language.id, //language.id comes from async function above
       )
 
       res.json({
