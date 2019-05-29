@@ -71,10 +71,36 @@ languageRouter
 languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
 
-   
-  console.log(req.body.word)
+    //validate the req body fields
+    if (!req.body.word) {
+      return res.status(400).send({error: `No input from client`});
+    }
+    
+    let correctWord  = await LanguageService.getHeadWord(
+      req.app.get('db'), 
+        req.user.id,
+    )
+      //TO-DO implement singly linked list
+    let correctTrans = correctWord[0].translation
 
+      // check submitted answer by comparing it with the trans in DB
+    if(req.body.word === correctTrans){
+       console.log('answer was correct')
 
+      //update correct_count
+      //update totalScore
+      //shift word approprite amount of space (double the word's memory_value and move word back M places)
+      // update the word on the database 'persist'
+      //send a response with the fields for feedback as well as the next word to guess *look at examples from fixtures*
+    } else{
+      console.log('answer was wrong')
+
+      //update incorrect_count
+      //shift word approprite amount of space (reset the word's memory_value to 1 and move word back M places)
+      // update the word on the database 'persist'
+      //send a response with the fields for feedback as well as the next word to guess *look at examples from fixtures*
+
+    }
 
    res.json(null)
   })

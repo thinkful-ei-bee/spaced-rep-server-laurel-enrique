@@ -38,6 +38,7 @@ const LanguageService = {
         'original',
         'correct_count',
         'incorrect_count',
+        'translation',
         'language_id'
         )
       .join('language', 'language.id', '=', 'word.language_id') // in the case the user has multiple languages
