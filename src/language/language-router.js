@@ -1,7 +1,7 @@
 const express = require('express')
 const LanguageService = require('./language-service')
 const { requireAuth } = require('../middleware/jwt-auth')
-
+const jsonBodyParser= express.json()
 const languageRouter = express.Router()
 
 languageRouter
@@ -69,9 +69,14 @@ languageRouter
   })
 
 languageRouter
-  .post('/guess', async (req, res, next) => {
-    // implement me
-    res.send('implement me!')
+  .post('/guess', jsonBodyParser, async (req, res, next) => {
+
+   
+  console.log(req.body.word)
+
+
+
+   res.json(null)
   })
 
 module.exports = languageRouter
