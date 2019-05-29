@@ -44,15 +44,6 @@ languageRouter
   })
 
 
-
-//
-// {
-//   "nextWord": "Testnextword",
-//   "wordCorrectCount": 222,
-//   "wordIncorrectCount": 333,
-//   "totalScore": 999
-// }
-
 languageRouter
   .get('/head', async (req, res, next) => {
     let word = await LanguageService.getHeadWord(
@@ -74,15 +65,8 @@ languageRouter
         totalScore: Number(totalScore.total_score)
     }
 
-
-
     return res.status(200).json(headWord);
   })
-
-
-
-
-
 
 languageRouter
   .post('/guess', async (req, res, next) => {
