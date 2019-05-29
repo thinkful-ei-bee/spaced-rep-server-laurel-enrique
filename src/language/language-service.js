@@ -28,6 +28,33 @@ const LanguageService = {
       )
       .where({ language_id })
   },
+
+
+
+  getHeadWord(db, userId) {
+    return db
+      .from('word')
+      .select(
+        'original',
+        'correct_count',
+        'incorrect_count',
+        'language_id'
+        )
+      .join('language', 'language.id', '=', 'word.language_id') // in the case the user has multiple languages
+      .where({ 'language.user_id': userId }) //in the case there are multiple users
+      .where('word.id', '=', db.raw('language.head'))
+
+  },
+
+
+  getTotalScore(db, userId) {
+    return db
+      .from('language')
+      .select('total_score')
+      .where({'language.user_id': userId })
+  },
 }
+
+
 
 module.exports = LanguageService
