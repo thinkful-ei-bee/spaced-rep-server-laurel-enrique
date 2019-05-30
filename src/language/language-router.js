@@ -74,34 +74,33 @@ languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
 
     
-    if (!req.body.word) {     //validate the req body fields
-      return res.status(400).send({error: `No input from client`});
+    if (!req.body.guess) {     //validate the req body fields
+      return res.status(400).send({error: `Missing 'guess' in request body`});
     }
-    
-    let headWord  = await LanguageService.getHeadWord(
-      req.app.get('db'), 
-        req.user.id,
-    )
-    headWord=headWord[0]
-     
-    let correctTrans = headWord.translation
-
 
 
       let sll = new LinkedList()
       const words = await LanguageService.getLanguageWords(
-        req.app.get('db'), // uses language.id to get the items from word table
-        req.language.id, //language.id comes from async function above
+        req.app.get('db'),
+        req.language.id, 
       )
-     
-
+    
      for(let i=0; i<words.length; i++){
        sll.insertLast(words[i])
      }
-     
-    
-    if(req.body.word === correctTrans){       // check submitted answer by comparing it with the trans in DB
 
+
+
+
+
+     
+     let totalScore = await LanguageService.getTotalScore(
+      req.app.get('db'),
+      req.user.id
+    );
+      totalScore = totalScore[0].total_score
+
+    if(req.body.guess === sll.head.value.translation){       
       
       ListService.updateCorrect(sll)
       let item = sll.head.value
@@ -109,58 +108,72 @@ languageRouter
       sll.insertAt(item.memory_value, item)
       // ListService.displayList(sll)
 
-      let totalScore = await LanguageService.updateTotalScore(
+      let changes = {
+        total_score: totalScore+1,
+        head:sll.head.value.id
+      }
+
+
+       await LanguageService.updateLanguageTable(
+        req.app.get('db'),
+        req.user.id,
+        changes
+      );
+
+
+      let newScore = await LanguageService.getTotalScore(
         req.app.get('db'),
         req.user.id
       );
-     
+
+        newScore = newScore[0].total_score
+        console.log(newScore, '<-------------------')
       response ={
-        "nextWord": sll.head.value,//should it return just the word or the whole obj?
-        "wordCorrectCount": item.correct_count,
-        "wordIncorrectCount": item.incorrect_count,
-        "totalScore": totalScore[0].total_score,
+        "nextWord": sll.head.value.original,
+        "wordCorrectCount": sll.head.value.correct_count,
+        "wordIncorrectCount": sll.head.value.incorrect_count,
+        "totalScore": newScore,
         "answer": item.translation,
         "isCorrect": true
       }
-   
-      return response
+      // console.log(response)
+      return res.status(200).json(response)
 
-      //update totalScore
-      // update the word on the database 'persist'
+ 
     } else{
-      console.log('answer was wrong')
+      
 
-      ListService.updateIncorrect(sll)
+      // ListService.updateIncorrect(sll)
       let item = sll.head.value
+      item.incorrect_count += 1
+      item.memory_value = Number(1)
       sll.remove(sll.head)
       sll.insertAt(item.memory_value, item)
       // ListService.displayList(sll)
 
-      let totalScore = await LanguageService.getTotalScore(
-        req.app.get('db'),
-        req.user.id
-      );
+     
+    
         
 
       response ={
-        "nextWord": sll.head.value, //should it return just the word or the whole obj?
-         "wordCorrectCount": item.correct_count,
-        "wordIncorrectCount": item.incorrect_count,
-        "totalScore":totalScore[0].total_score,
+        "nextWord": sll.head.value.original, //should it return just the word or the whole obj?
+         "wordCorrectCount": sll.head.value.correct_count,
+        "wordIncorrectCount": sll.head.value.incorrect_count,
+        "totalScore":totalScore,
         "answer": item.translation,
         "isCorrect": false
       }
-      // console.log(response)
-      // return response
+    //  console.log(response)
+      return res.status(200).json(response)
       
 
 
       
-      // update the word on the database 'persist'
+      
 
     }
-
-   res.json(null)
+  
+   
   })
 
 module.exports = languageRouter

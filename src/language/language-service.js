@@ -29,7 +29,16 @@ const LanguageService = {
       .where({ language_id })
   },
 
-
+  updateLanguageTable(db,user_id , changes){
+    return db
+      .from ('language')
+      .where('language.user_id', user_id)
+      .update({
+        total_score: changes.total_score,
+        head: changes.head
+      })
+     
+  },
 
   getHeadWord(db, userId) {
     return db
@@ -56,27 +65,15 @@ const LanguageService = {
       .select('total_score')
       .where({'language.user_id': userId })
   },
-  updateTotalScore(db, userId) {
+  updateTotalScore(db, userId, score) {
     return db
       .from('language')
       .select('total_score')
       .where({'language.user_id': userId })
+      .update({total_score:score})
   },
 
-  updateCorrect(word){
-    let newWord = word
-  
-    newWord.correct_count += 1
-    newWord.memory_value = Number(word.memory_value + word.memory_value)
-    return newWord;
-  },
-  updateIncorrect(word){
-    let newWord = word
-  
-    newWord.incorrect_count += 1
-    newWord.memory_value = Number(1)
-    return newWord;
-  }
+
 }
 
 
