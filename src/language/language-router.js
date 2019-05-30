@@ -3,6 +3,8 @@ const LanguageService = require('./language-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 const jsonBodyParser= express.json()
 const languageRouter = express.Router()
+const LinkedList = require('../linked-list/list')
+const ListService=require('../linked-list/list-service')
 
 languageRouter
   .use(requireAuth) 
@@ -71,34 +73,90 @@ languageRouter
 languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
 
-    //validate the req body fields
-    if (!req.body.word) {
+    
+    if (!req.body.word) {     //validate the req body fields
       return res.status(400).send({error: `No input from client`});
     }
     
-    let correctWord  = await LanguageService.getHeadWord(
+    let headWord  = await LanguageService.getHeadWord(
       req.app.get('db'), 
         req.user.id,
     )
-      //TO-DO implement singly linked list
-    let correctTrans = correctWord[0].translation
+    headWord=headWord[0]
+     
+    let correctTrans = headWord.translation
 
-      // check submitted answer by comparing it with the trans in DB
-    if(req.body.word === correctTrans){
-       console.log('answer was correct')
 
-      //update correct_count
+
+      let sll = new LinkedList()
+      const words = await LanguageService.getLanguageWords(
+        req.app.get('db'), // uses language.id to get the items from word table
+        req.language.id, //language.id comes from async function above
+      )
+     
+
+     for(let i=0; i<words.length; i++){
+       sll.insertLast(words[i])
+     }
+     
+    
+    if(req.body.word === correctTrans){       // check submitted answer by comparing it with the trans in DB
+
+      
+      ListService.updateCorrect(sll)
+      let item = sll.head.value
+      sll.remove(sll.head)
+      sll.insertAt(item.memory_value, item)
+      // ListService.displayList(sll)
+
+      let totalScore = await LanguageService.updateTotalScore(
+        req.app.get('db'),
+        req.user.id
+      );
+     
+      response ={
+        "nextWord": sll.head.value,//should it return just the word or the whole obj?
+        "wordCorrectCount": item.correct_count,
+        "wordIncorrectCount": item.incorrect_count,
+        "totalScore": totalScore[0].total_score,
+        "answer": item.translation,
+        "isCorrect": true
+      }
+   
+      return response
+
       //update totalScore
-      //shift word approprite amount of space (double the word's memory_value and move word back M places)
       // update the word on the database 'persist'
-      //send a response with the fields for feedback as well as the next word to guess *look at examples from fixtures*
     } else{
       console.log('answer was wrong')
 
-      //update incorrect_count
-      //shift word approprite amount of space (reset the word's memory_value to 1 and move word back M places)
+      ListService.updateIncorrect(sll)
+      let item = sll.head.value
+      sll.remove(sll.head)
+      sll.insertAt(item.memory_value, item)
+      // ListService.displayList(sll)
+
+      let totalScore = await LanguageService.getTotalScore(
+        req.app.get('db'),
+        req.user.id
+      );
+        
+
+      response ={
+        "nextWord": sll.head.value, //should it return just the word or the whole obj?
+         "wordCorrectCount": item.correct_count,
+        "wordIncorrectCount": item.incorrect_count,
+        "totalScore":totalScore[0].total_score,
+        "answer": item.translation,
+        "isCorrect": false
+      }
+      // console.log(response)
+      // return response
+      
+
+
+      
       // update the word on the database 'persist'
-      //send a response with the fields for feedback as well as the next word to guess *look at examples from fixtures*
 
     }
 

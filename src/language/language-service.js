@@ -39,6 +39,8 @@ const LanguageService = {
         'correct_count',
         'incorrect_count',
         'translation',
+        'memory_value',
+        'next',
         'language_id'
         )
       .join('language', 'language.id', '=', 'word.language_id') // in the case the user has multiple languages
@@ -54,6 +56,27 @@ const LanguageService = {
       .select('total_score')
       .where({'language.user_id': userId })
   },
+  updateTotalScore(db, userId) {
+    return db
+      .from('language')
+      .select('total_score')
+      .where({'language.user_id': userId })
+  },
+
+  updateCorrect(word){
+    let newWord = word
+  
+    newWord.correct_count += 1
+    newWord.memory_value = Number(word.memory_value + word.memory_value)
+    return newWord;
+  },
+  updateIncorrect(word){
+    let newWord = word
+  
+    newWord.incorrect_count += 1
+    newWord.memory_value = Number(1)
+    return newWord;
+  }
 }
 
 
