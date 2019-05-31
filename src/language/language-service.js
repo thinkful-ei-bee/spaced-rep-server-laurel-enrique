@@ -27,6 +27,7 @@ const LanguageService = {
         'incorrect_count',
       )
       .where({ language_id })
+      .orderBy('next')
   },
 
   getWordById(db, id) {

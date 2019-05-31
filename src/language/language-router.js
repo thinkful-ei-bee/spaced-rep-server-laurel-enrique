@@ -138,13 +138,11 @@ languageRouter
       
       sll.remove(sll.head)
         
-    let newHead= sll.head.value
+      let newHead= sll.head.value
 
       console.log(newHead,' is the new Head')
 
       sll.insertAt(oldHead.memory_value*2, oldHead)
-
-
 
       let newNext =  sll.find(oldHead)
 
@@ -202,9 +200,6 @@ languageRouter
         }
       )
 
-    
-     
-      
        res.status(200).json(response)
         next()
  
@@ -234,14 +229,8 @@ languageRouter
       newHead.next = oldHead.id
       sll.insertAt(1, oldHead)
 
+      let prevWord= newHead
 
-
-     
-
-let prevWord= newHead
-
-      
-    
       prevWord.next= oldHead.id
 
       prevId=prevWord.id
