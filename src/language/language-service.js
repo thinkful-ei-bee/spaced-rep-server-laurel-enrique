@@ -72,12 +72,19 @@ const LanguageService = {
         'next',
         'language_id'
         )
-      .join('language', 'language.id', '=', 'word.language_id') // in the case the user has multiple languages
-      .where({ 'language.user_id': userId }) //in the case there are multiple users
+      .join('language', 'language.id', '=', 'word.language_id') 
+      .where({ 'language.user_id': userId }) 
       .where('word.id', '=', db.raw('language.head'))
 
   },
-
+  // updateHeadWord(db, userId, next){
+  //   return db
+  //   .from('word')
+  //   .join('language', 'language.id', '=', 'word.language_id') 
+  //   .where({ 'language.user_id': userId }) 
+  //   .where('word.id', '=', db.raw('language.head'))
+  //   .update({'next':next})
+  // },
 
   getTotalScore(db, userId) {
     return db

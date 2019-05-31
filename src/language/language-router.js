@@ -106,8 +106,8 @@ languageRouter
        
        
        
-       let listHead = sll.head.value
-       let nextWord=sll.head.next.value
+       const listHead = sll.head.value
+       const nextWord=sll.head.next.value
 
 
 
@@ -146,24 +146,23 @@ languageRouter
       let prevId= ListService.findPrevious(sll, oldHead.value)
       prevId=prevId.value.id
 
-      console.log(prevId,'<<<<<<<< prevId')
+
 
 
       let wordChanges={
-        memory_value : oldHead.value.memory_value *2,
-        correct_count: oldHead.value.correct_count+1,
+        memory_value : listHead.memory_value *2,
+        correct_count: listHead.correct_count+1,
         next: newNext
       }
       
       let changes = {
         total_score: totalScore+1,
-        head:sll.head.value.id
+        head:nextWord.id
       }
-      console.log(changes, wordChanges)
+    
 
       let prevChanges={
-     
-        next: oldHead.value.id,
+        next: listHead.id,
       }
 
       
@@ -200,33 +199,25 @@ languageRouter
       response.isCorrect=false
       
 
-
+// probably don't need the 6 lines if it is false
       let oldHead = sll.head;
       sll.remove(sll.head)
-  
-  
       sll.insertAt(oldHead.value.memory_value, oldHead.value)
-
-    
-    
-    
-
       let prevId= ListService.findPrevious(sll, oldHead.value)
       prevId=prevId.value.id
-
       console.log(prevId,'<<<<<<<< prevId')
 
 
 
       let changes = {
        
-        head:sll.head.value.id
+        head:nextWord.id
       }
       
       let wordChanges={
         memory_value : 1,
         incorrect_count: oldHead.value.incorrect_count+1,
-        next: oldHead.value.id,
+        next: nextWord.id,
       }
 
       let prevChanges={
