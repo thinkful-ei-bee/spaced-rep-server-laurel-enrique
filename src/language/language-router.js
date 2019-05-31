@@ -106,7 +106,7 @@ languageRouter
        req.user.id
        );
        totalScore = totalScore[0].total_score
-       console.log(totalScore,'<----- Total Score')
+  
        
        
        const listHead = sll.head.value
@@ -125,8 +125,10 @@ languageRouter
      
     if(guess === listHead.translation){  
         
-        //================ if Correct ==================    
-           
+          
+        console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
+        ListService.displayList(sll)
+
       
       response.totalScore = Number(totalScore+= 1)
       response.isCorrect=true
@@ -138,7 +140,7 @@ languageRouter
         
     
 
-      sll.insertAt(oldHead.value.memory_value+1, oldHead.value)
+      sll.insertAt(oldHead.value.memory_value*2, oldHead.value)
 
 
 
@@ -152,46 +154,47 @@ languageRouter
 
 
 
-
-      // ListService.displayList(sll)
+      console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
+      ListService.displayList(sll)
       
-       await LanguageService.updateLanguageTable(
-        req.app.get('db'),
-        req.user.id,
-        {
-          total_score:Number(totalScore+1),
-          head:nextWord.id
-        }
-      );
+      //  await LanguageService.updateLanguageTable(
+      //   req.app.get('db'),
+      //   req.user.id,
+      //   {
+      //     total_score:Number(totalScore+1),
+      //     head:nextWord.id
+      //   }
+      // );
 
-      await LanguageService.updateWord(
-        req.app.get('db'),
-        oldHead.value.id,
-        {
-          memory_value : oldHead.value.memory_value *2,
-          correct_count: oldHead.value.correct_count+1,
-          next: newNext
-        }
-      )
-      await LanguageService.updatePrevious(
-        req.app.get('db'),
-        prevId,
-        {
-          next: listHead.id,
-        }
-      )
+      // await LanguageService.updateWord(
+      //   req.app.get('db'),
+      //   oldHead.value.id,
+      //   {
+      //     memory_value : oldHead.value.memory_value *2,
+      //     correct_count: oldHead.value.correct_count+1,
+      //     next: newNext
+      //   }
+      // )
+      // await LanguageService.updatePrevious(
+      //   req.app.get('db'),
+      //   prevId,
+      //   {
+      //     next: listHead.id,
+      //   }
+      // )
 
     
-      console.log(response,'<------response')
+     
       
        res.status(200).json(response)
         next()
  
     } else{
-      //================ if Incorrect ==================    
+      
      
+      console.log('------------LIST BEFORE WITH WRONG ANSWER ----------------')
 
-   
+      ListService.displayList(sll)
       
       
       response.isCorrect=false
@@ -202,46 +205,46 @@ languageRouter
       let oldHead = sll.head;
       sll.remove(sll.head)
       
-      sll.insertAt(oldHead.value.memory_value+1, oldHead.value)
+      sll.insertAt(1, oldHead.value)
       let prevId= ListService.findPrevious(sll, oldHead.value)
       prevId=sll.head.value.id
-      console.log(prevId,'<<<<<<<< prevId')
+      
 
 
 
-      // ListService.displayList(sll)
+  
+
+
+      console.log('---------------LIST AFTER-------------------')
+      ListService.displayList(sll)
+
+
+      //  await LanguageService.updateLanguageTable(
+      //   req.app.get('db'),
+      //   req.user.id,
+      //   {
+      //     head:nextWord.id
+      //   }
+      // );
 
 
 
-
-
-       await LanguageService.updateLanguageTable(
-        req.app.get('db'),
-        req.user.id,
-        {
-          head:nextWord.id
-        }
-      );
-
-
-       
-
-      await LanguageService.updateWord(
-        req.app.get('db'),
-          oldHead.value.id,
-          {
-            memory_value : 1,
-            incorrect_count: oldHead.value.incorrect_count+1,
-            next: nextWord.id,
-          }
-      )
-      await LanguageService.updatePrevious(
-        req.app.get('db'),
-        prevId,
-        {
-          next: oldHead.value.id,
-        }
-      )
+      // await LanguageService.updateWord(
+      //   req.app.get('db'),
+      //     oldHead.value.id,
+      //     {
+      //       memory_value : 1,
+      //       incorrect_count: Number(listHead.incorrect_count+=1),
+      //       next: nextWord.id,
+      //     }
+      // )
+      // await LanguageService.updatePrevious(
+      //   req.app.get('db'),
+      //   prevId,
+      //   {
+      //     next: oldHead.value.id,
+      //   }
+      // )
 
     
         
