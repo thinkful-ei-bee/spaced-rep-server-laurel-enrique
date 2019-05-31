@@ -133,23 +133,38 @@ languageRouter
       response.totalScore = Number(totalScore+= 1)
       response.isCorrect=true
       
-      let oldHead = sll.head;
+      let oldHead = sll.head.value;
 
       
       sll.remove(sll.head)
         
-    
+    let newHead= sll.head.value
 
-      sll.insertAt(oldHead.value.memory_value*2, oldHead.value)
+      console.log(newHead,' is the new Head')
+
+      sll.insertAt(oldHead.memory_value*2, oldHead)
 
 
 
-      let newNext =  sll.find(oldHead.value)
+      let newNext =  sll.find(oldHead)
       newNext= newNext.next.value.id
+      
+      oldHead.next = newNext
+
+      let prevWord= ListService.findPrevious(sll, oldHead)
+      prevWord= prevWord.value
+    
+      prevWord.next= oldHead.id
+      // prevId=prevWordId <--- use to find in db later
+
      
 
-      let prevId= ListService.findPrevious(sll, oldHead.value)
-      prevId=prevId.value.id
+
+
+
+
+
+
 
 
 
@@ -201,12 +216,22 @@ languageRouter
       response.totalScore= totalScore
       
 
-// probably don't need the 6 lines if it is false
-      let oldHead = sll.head;
+      let oldHead = sll.head.value;
+
       sll.remove(sll.head)
-      
-      sll.insertAt(1, oldHead.value)
-      let prevId= ListService.findPrevious(sll, oldHead.value)
+
+      oldHead.next = thirdWord.id
+
+      let newHead= sll.head.value
+
+      console.log(newHead,' is the new Head')
+
+      newHead.next = oldHead.id
+      sll.insertAt(1, oldHead)
+
+
+
+      let prevId= ListService.findPrevious(sll, oldHead)
       prevId=sll.head.value.id
       
 
