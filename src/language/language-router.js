@@ -70,6 +70,9 @@ languageRouter
     return res.status(200).json(headWord);
   })
 
+
+
+
 languageRouter
   .post('/guess', jsonBodyParser, async (req, res, next) => {
 
@@ -103,23 +106,22 @@ languageRouter
        req.user.id
        );
        totalScore = totalScore[0].total_score
-       
+       console.log(totalScore,'<----- Total Score')
        
        
        const listHead = sll.head.value
        const nextWord=sll.head.next.value
+       const thirdWord=sll.head.next.next.value
 
-
-
+    
       let response = {
         nextWord:nextWord.original,
         wordCorrectCount:nextWord.correct_count,
         wordIncorrectCount:nextWord.incorrect_count,
         answer: listHead.translation,
-        totalScore:totalScore,
+        
       }
 
-      console.log(guess===listHead.translation,'---------------')
      
     if(guess === listHead.translation){  
         
@@ -135,7 +137,8 @@ languageRouter
       sll.remove(sll.head)
         
     
-      sll.insertAt(oldHead.value.memory_value, oldHead.value)
+
+      sll.insertAt(oldHead.value.memory_value+1, oldHead.value)
 
 
 
@@ -149,42 +152,37 @@ languageRouter
 
 
 
-      let wordChanges={
-        memory_value : listHead.memory_value *2,
-        correct_count: listHead.correct_count+1,
-        next: newNext
-      }
-      
-      let changes = {
-        total_score: totalScore+1,
-        head:nextWord.id
-      }
-    
 
-      let prevChanges={
-        next: listHead.id,
-      }
-
+      // ListService.displayList(sll)
       
        await LanguageService.updateLanguageTable(
         req.app.get('db'),
         req.user.id,
-        changes
+        {
+          total_score:Number(totalScore+1),
+          head:nextWord.id
+        }
       );
 
       await LanguageService.updateWord(
         req.app.get('db'),
         oldHead.value.id,
-        wordChanges
+        {
+          memory_value : oldHead.value.memory_value *2,
+          correct_count: oldHead.value.correct_count+1,
+          next: newNext
+        }
       )
       await LanguageService.updatePrevious(
         req.app.get('db'),
         prevId,
-        prevChanges
+        {
+          next: listHead.id,
+        }
       )
 
     
- 
+      console.log(response,'<------response')
       
        res.status(200).json(response)
         next()
@@ -197,36 +195,21 @@ languageRouter
       
       
       response.isCorrect=false
+      response.totalScore= totalScore
       
 
 // probably don't need the 6 lines if it is false
       let oldHead = sll.head;
       sll.remove(sll.head)
-      sll.insertAt(oldHead.value.memory_value, oldHead.value)
+      
+      sll.insertAt(oldHead.value.memory_value+1, oldHead.value)
       let prevId= ListService.findPrevious(sll, oldHead.value)
-      prevId=prevId.value.id
+      prevId=sll.head.value.id
       console.log(prevId,'<<<<<<<< prevId')
 
 
 
-      let changes = {
-       
-        head:nextWord.id
-      }
-      
-      let wordChanges={
-        memory_value : 1,
-        incorrect_count: oldHead.value.incorrect_count+1,
-        next: nextWord.id,
-      }
-
-      let prevChanges={
-     
-        next: oldHead.value.id,
-      }
-
-
-
+      // ListService.displayList(sll)
 
 
 
@@ -235,7 +218,9 @@ languageRouter
        await LanguageService.updateLanguageTable(
         req.app.get('db'),
         req.user.id,
-        changes
+        {
+          head:nextWord.id
+        }
       );
 
 
@@ -244,12 +229,18 @@ languageRouter
       await LanguageService.updateWord(
         req.app.get('db'),
           oldHead.value.id,
-           wordChanges
+          {
+            memory_value : 1,
+            incorrect_count: oldHead.value.incorrect_count+1,
+            next: nextWord.id,
+          }
       )
       await LanguageService.updatePrevious(
         req.app.get('db'),
-         prevId,
-           prevChanges
+        prevId,
+        {
+          next: oldHead.value.id,
+        }
       )
 
     
