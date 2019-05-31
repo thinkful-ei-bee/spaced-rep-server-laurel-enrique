@@ -147,15 +147,19 @@ languageRouter
 
 
       let newNext =  sll.find(oldHead)
+
       newNext= newNext.next.value.id
       
       oldHead.next = newNext
-
+      oldHead.correct_count+=1
+      oldHead.memory_value*=2
       let prevWord= ListService.findPrevious(sll, oldHead)
+
       prevWord= prevWord.value
     
       prevWord.next= oldHead.id
-      // prevId=prevWordId <--- use to find in db later
+
+      prevId=prevWord.id
 
      
 
@@ -172,31 +176,31 @@ languageRouter
       console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
       ListService.displayList(sll)
       
-      //  await LanguageService.updateLanguageTable(
-      //   req.app.get('db'),
-      //   req.user.id,
-      //   {
-      //     total_score:Number(totalScore+1),
-      //     head:nextWord.id
-      //   }
-      // );
+       await LanguageService.updateLanguageTable(
+        req.app.get('db'),
+        req.user.id,
+        {
+          total_score:Number(totalScore+1),
+          head:newHead.id
+        }
+      );
 
-      // await LanguageService.updateWord(
-      //   req.app.get('db'),
-      //   oldHead.value.id,
-      //   {
-      //     memory_value : oldHead.value.memory_value *2,
-      //     correct_count: oldHead.value.correct_count+1,
-      //     next: newNext
-      //   }
-      // )
-      // await LanguageService.updatePrevious(
-      //   req.app.get('db'),
-      //   prevId,
-      //   {
-      //     next: listHead.id,
-      //   }
-      // )
+      await LanguageService.updateWord(
+        req.app.get('db'),
+        oldHead.id,
+        {
+          memory_value : oldHead.memory_value,
+          correct_count: oldHead.correct_count,
+          next: oldHead.next
+        }
+      )
+      await LanguageService.updatePrevious(
+        req.app.get('db'),
+        prevId,
+        {
+          next: prevWord.next,
+        }
+      )
 
     
      
@@ -220,10 +224,11 @@ languageRouter
 
       sll.remove(sll.head)
 
-      oldHead.next = thirdWord.id
-
+      
       let newHead= sll.head.value
-
+      
+      oldHead.next = newHead.next
+      oldHead.incorrect_count+=1
       console.log(newHead,' is the new Head')
 
       newHead.next = oldHead.id
@@ -231,11 +236,15 @@ languageRouter
 
 
 
-      let prevId= ListService.findPrevious(sll, oldHead)
-      prevId=sll.head.value.id
+     
+
+let prevWord= newHead
+
       
+    
+      prevWord.next= oldHead.id
 
-
+      prevId=prevWord.id
 
   
 
@@ -244,32 +253,32 @@ languageRouter
       ListService.displayList(sll)
 
 
-      //  await LanguageService.updateLanguageTable(
-      //   req.app.get('db'),
-      //   req.user.id,
-      //   {
-      //     head:nextWord.id
-      //   }
-      // );
+       await LanguageService.updateLanguageTable(
+        req.app.get('db'),
+        req.user.id,
+        {
+          head:newHead.id
+        }
+      );
 
 
 
-      // await LanguageService.updateWord(
-      //   req.app.get('db'),
-      //     oldHead.value.id,
-      //     {
-      //       memory_value : 1,
-      //       incorrect_count: Number(listHead.incorrect_count+=1),
-      //       next: nextWord.id,
-      //     }
-      // )
-      // await LanguageService.updatePrevious(
-      //   req.app.get('db'),
-      //   prevId,
-      //   {
-      //     next: oldHead.value.id,
-      //   }
-      // )
+      await LanguageService.updateWord(
+        req.app.get('db'),
+          oldHead.id,
+          {
+            memory_value : 1,
+            incorrect_count: oldHead.incorrect_count,
+            next: oldHead.next,
+          }
+      )
+      await LanguageService.updatePrevious(
+        req.app.get('db'),
+        prevId,
+        {
+          next: prevWord.next,
+        }
+      )
 
     
         
