@@ -60,12 +60,6 @@ updateCorrect(list){
     newList.head.value.memory_value = Number(newList.head.value.memory_value * 2)
     return newList;
   },
-  updateIncorrect(list){
-    let newList = list
-  
-    newList.head.value.incorrect_count += 1
-    newList.head.value.memory_value = Number(1)
-    return newList;
-  }
+
 }
 module.exports = ListService;
