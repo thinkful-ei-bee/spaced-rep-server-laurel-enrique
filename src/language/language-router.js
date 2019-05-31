@@ -110,21 +110,23 @@ languageRouter
        
        
     
-
+      let isCorrect;
     
       let response = {
         
       }
 
+      console.log(guess, sll.head.value.translation)
+      console.log(sll.head)
      
     if(guess === sll.head.value.translation){  
         
           
-        console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
-        ListService.displayList(sll)
+        // console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
+        // ListService.displayList(sll)
 
       
-    
+      isCorrect =true
       
       let oldHead = sll.head.value;
 
@@ -155,8 +157,8 @@ languageRouter
       totalScore +=1
 
   
-      console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
-      ListService.displayList(sll)
+      // console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
+      // ListService.displayList(sll)
       
        await LanguageService.updateLanguageTable(
         req.app.get('db'),
@@ -188,7 +190,7 @@ languageRouter
        response = {
         nextWord:newHead.original,
         answer: oldHead.translation,
-        isCorrect: true,
+        isCorrect,
         totalScore:Number(totalScore),
         wordCorrectCount:newHead.correct_count,
         wordIncorrectCount:newHead.incorrect_count,
@@ -202,13 +204,13 @@ languageRouter
     } else{
       
      
-      console.log('------------LIST BEFORE WITH WRONG ANSWER ----------------')
+      // console.log('------------LIST BEFORE WITH WRONG ANSWER ----------------')
 
-      ListService.displayList(sll)
+      // ListService.displayList(sll)
       
       
    
-      
+      isCorrect=false
 
       let oldHead = sll.head.value;
 
@@ -233,8 +235,8 @@ languageRouter
   
 
 
-      console.log('---------------LIST AFTER-------------------')
-      ListService.displayList(sll)
+      // console.log('---------------LIST AFTER-------------------')
+      // ListService.displayList(sll)
 
 
        await LanguageService.updateLanguageTable(
@@ -270,7 +272,7 @@ languageRouter
         wordCorrectCount:newHead.correct_count,
         wordIncorrectCount:newHead.incorrect_count,
         answer: oldHead.translation,
-        isCorrect: false,
+        isCorrect,
         totalScore:totalScore
       }
 
