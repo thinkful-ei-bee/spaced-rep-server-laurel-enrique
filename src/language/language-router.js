@@ -109,18 +109,15 @@ languageRouter
   
        
        
-       const listHead = sll.head.value
-       const nextWord=sll.head.next.value
-     
+    
 
     
       let response = {
-     
         
       }
 
      
-    if(guess === listHead.translation){  
+    if(guess === sll.head.value.translation){  
         
           
         console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
@@ -155,7 +152,9 @@ languageRouter
 
       prevId=prevWord.id
 
+      totalScore +=1
 
+  
       console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
       ListService.displayList(sll)
       
@@ -172,6 +171,7 @@ languageRouter
         req.app.get('db'),
         oldHead.id,
         {
+
           memory_value : oldHead.memory_value,
           correct_count: oldHead.correct_count,
           next: oldHead.next
@@ -187,11 +187,11 @@ languageRouter
 
        response = {
         nextWord:newHead.original,
-        wordCorrectCount:newHead.correct_count,
-        wordIncorrectCount:newHead.incorrect_count,
         answer: oldHead.translation,
         isCorrect: true,
-        totalScore:Number(totalScore+ 1)
+        totalScore:Number(totalScore),
+        wordCorrectCount:newHead.correct_count,
+        wordIncorrectCount:newHead.incorrect_count,
       }
       
       console.log(response,'<------- response if correct')
