@@ -111,14 +111,11 @@ languageRouter
        
        const listHead = sll.head.value
        const nextWord=sll.head.next.value
-       const thirdWord=sll.head.next.next.value
+     
 
     
       let response = {
-        nextWord:nextWord.original,
-        wordCorrectCount:nextWord.correct_count,
-        wordIncorrectCount:nextWord.incorrect_count,
-        answer: listHead.translation,
+     
         
       }
 
@@ -130,8 +127,7 @@ languageRouter
         ListService.displayList(sll)
 
       
-      response.totalScore = Number(totalScore+= 1)
-      response.isCorrect=true
+    
       
       let oldHead = sll.head.value;
 
@@ -158,17 +154,6 @@ languageRouter
       prevWord.next= oldHead.id
 
       prevId=prevWord.id
-
-     
-
-
-
-
-
-
-
-
-
 
 
       console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
@@ -200,6 +185,17 @@ languageRouter
         }
       )
 
+       response = {
+        nextWord:newHead.original,
+        wordCorrectCount:newHead.correct_count,
+        wordIncorrectCount:newHead.incorrect_count,
+        answer: oldHead.translation,
+        isCorrect: true,
+        totalScore:Number(totalScore+ 1)
+      }
+      
+      console.log(response,'<------- response if correct')
+
        res.status(200).json(response)
         next()
  
@@ -211,8 +207,7 @@ languageRouter
       ListService.displayList(sll)
       
       
-      response.isCorrect=false
-      response.totalScore= totalScore
+   
       
 
       let oldHead = sll.head.value;
@@ -270,7 +265,14 @@ languageRouter
       )
 
     
-        
+      response = {
+        nextWord:newHead.original,
+        wordCorrectCount:newHead.correct_count,
+        wordIncorrectCount:newHead.incorrect_count,
+        answer: oldHead.translation,
+        isCorrect: false,
+        totalScore:totalScore
+      }
 
      
        res.status(200).json(response)
