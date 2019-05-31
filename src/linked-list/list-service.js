@@ -53,13 +53,7 @@ const ListService={
     }
       return tempNode;
 },
-updateCorrect(list){
-    let newList = list
-  
-    newList.head.value.correct_count += 1
-    newList.head.value.memory_value = Number(newList.head.value.memory_value * 2)
-    return newList;
-  },
+
 
 }
 module.exports = ListService;

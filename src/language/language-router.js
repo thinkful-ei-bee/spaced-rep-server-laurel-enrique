@@ -75,6 +75,7 @@ languageRouter
 
     let guess = req.body.guess
 
+    try{
     //============= validate the req body fields ==================
     if (!guess) {     
       return res.status(400).send({error: `Missing 'guess' in request body`});
@@ -93,138 +94,188 @@ languageRouter
        sll.insertLast(words[i])
      }
 
-     let listHead = sll.head.value
-     console.log(listHead, "<-listHead right after dec")
-
-
-
-
-
-
-     let totalScore = await LanguageService.getTotalScore(
-      req.app.get('db'),
-      req.user.id
-    );
-      totalScore = totalScore[0].total_score
-
      
+     
+     
+     
+     let totalScore = await LanguageService.getTotalScore(
+       req.app.get('db'),
+       req.user.id
+       );
+       totalScore = totalScore[0].total_score
+       
+       
+       
+       let listHead = sll.head.value
+       let nextWord=sll.head.next.value
 
 
 
+      let response = {
+        nextWord:nextWord.original,
+        wordCorrectCount:nextWord.correct_count,
+        wordIncorrectCount:nextWord.incorrect_count,
+        answer: listHead.translation,
+        totalScore:totalScore,
+      }
 
-
-
-
-      let response = {}
-
+      console.log(guess===listHead.translation,'---------------')
+     
     if(guess === listHead.translation){  
-      
+        
+        //================ if Correct ==================    
            
-      response.wordIncorrectCount = listHead.incorrect_count
-      response.wordCorrectCount = listHead.correct_count  += 1
-      response.memory_value = listHead.memory_value *=2
-      response.totalScore = totalScore + 1
-      response.answer = listHead.translation
+      
+      response.totalScore = Number(totalScore+= 1)
       response.isCorrect=true
       
       let oldHead = sll.head;
+
       
       sll.remove(sll.head)
         
-      response.nextWord= sll.head.value.original
     
-
       sll.insertAt(oldHead.value.memory_value, oldHead.value)
 
 
-      ListService.displayList(sll)
+
+      let newNext =  sll.find(oldHead.value)
+      newNext= newNext.next.value.id
+     
+
+      let prevId= ListService.findPrevious(sll, oldHead.value)
+      prevId=prevId.value.id
+
+      console.log(prevId,'<<<<<<<< prevId')
 
 
-
-      let changes = {
-        total_score: response.totalScore,
-        head:sll.head.value.id
+      let wordChanges={
+        memory_value : oldHead.value.memory_value *2,
+        correct_count: oldHead.value.correct_count+1,
+        next: newNext
       }
       
-      let wordChanges={
-        memory_value : response.memory_value,
-        incorrect_count: response.wordIncorrectCount
+      let changes = {
+        total_score: totalScore+1,
+        head:sll.head.value.id
       }
       console.log(changes, wordChanges)
 
-      //  await LanguageService.updateLanguageTable(
-      //   req.app.get('db'),
-      //   req.user.id,
-      //   changes
-      // );
+      let prevChanges={
+     
+        next: oldHead.value.id,
+      }
 
+      
+       await LanguageService.updateLanguageTable(
+        req.app.get('db'),
+        req.user.id,
+        changes
+      );
 
-      // await LanguageService.updateWordTable(
-      //   req.app.get('db'),
-      //   req.language.id, 
-      // )
+      await LanguageService.updateWord(
+        req.app.get('db'),
+        oldHead.value.id,
+        wordChanges
+      )
+      await LanguageService.updatePrevious(
+        req.app.get('db'),
+        prevId,
+        prevChanges
+      )
 
+    
  
       
-      return res.status(200).json(response)
-
+       res.status(200).json(response)
+        next()
  
     } else{
-      console.log('=======if incorrect===========' )
+      //================ if Incorrect ==================    
+     
 
    
       
-      response.wordIncorrectCount = listHead.incorrect_count += 1
-      response.wordCorrectCount = listHead.correct_count
-      response.memory_value = 1
-      response.totalScore = totalScore
-      response.answer = listHead.translation
+      
       response.isCorrect=false
       
+
+
       let oldHead = sll.head;
       sll.remove(sll.head)
   
-      response.nextWord=sll.head.value.original
   
       sll.insertAt(oldHead.value.memory_value, oldHead.value)
 
-     
+    
+    
+    
+
+      let prevId= ListService.findPrevious(sll, oldHead.value)
+      prevId=prevId.value.id
+
+      console.log(prevId,'<<<<<<<< prevId')
+
+
+
       let changes = {
-        total_score: response.totalScore,
+       
         head:sll.head.value.id
       }
       
       let wordChanges={
-        memory_value : response.memory_value,
-        incorrect_count: response.wordIncorrectCount
+        memory_value : 1,
+        incorrect_count: oldHead.value.incorrect_count+1,
+        next: oldHead.value.id,
       }
-      console.log(changes, wordChanges)
 
-      //  await LanguageService.updateLanguageTable(
-      //   req.app.get('db'),
-      //   req.user.id,
-      //   changes
-      // );
+      let prevChanges={
+     
+        next: oldHead.value.id,
+      }
 
 
-      // await LanguageService.updateWordTable(
-      //   req.app.get('db'),
-      //   req.language.id, 
-           //wordChanges
-      // )
+
+
+
+
+
+
+       await LanguageService.updateLanguageTable(
+        req.app.get('db'),
+        req.user.id,
+        changes
+      );
+
+
+       
+
+      await LanguageService.updateWord(
+        req.app.get('db'),
+          oldHead.value.id,
+           wordChanges
+      )
+      await LanguageService.updatePrevious(
+        req.app.get('db'),
+         prevId,
+           prevChanges
+      )
 
     
         
 
      
-      return res.status(200).json(response)
+       res.status(200).json(response)
       
 
-
+        next()
       
       
 
     }
+  } catch (error) {
+    next(error)
+  }
   
    
   })

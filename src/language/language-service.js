@@ -29,6 +29,26 @@ const LanguageService = {
       .where({ language_id })
   },
 
+  getWordById(db, id) {
+    return db 
+      .from('word')
+      .select('*')
+      .where({ id });
+  },
+
+  updateWord(db, id, wordChanges) {
+    return db
+      .from('word')
+      .where({id} )
+      .update(wordChanges)
+  },
+  updatePrevious(db, id, prevChanges) {
+    return db
+      .from('word')
+      .where('id', id )
+      .update(prevChanges)
+  },
+
   updateLanguageTable(db,user_id , changes){
     return db
       .from ('language')
