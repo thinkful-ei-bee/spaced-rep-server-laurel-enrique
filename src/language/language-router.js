@@ -97,8 +97,11 @@ languageRouter
        sll.insertLast(words[i])
      }
 
-     
-     
+     let headWord = await LanguageService.getHeadWord(
+      req.app.get('db'), 
+        req.user.id,
+    )
+     headWord=headWord[0]
      
      
      let totalScore = await LanguageService.getTotalScore(
@@ -119,7 +122,7 @@ languageRouter
       console.log(guess, sll.head.value.translation)
       console.log(sll.head)
      
-    if(guess === sll.head.value.translation){  
+    if(guess === headWord.translation){  
         
           
         // console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
@@ -131,13 +134,10 @@ languageRouter
       let oldHead = sll.head.value;
 
       sll.insertAt(oldHead.memory_value*2, oldHead)
-      
       sll.remove(sll.head)
+      
         
       let newHead= sll.head.value
-
-
-
 
       let newNext =  sll.find(oldHead)
 
@@ -151,20 +151,37 @@ languageRouter
     
       prevWord.next= oldHead.id
 
-      prevId=prevWord.id
+      
 
     
 
-  
-      // console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
-      // ListService.displayList(sll)
+ 
+
+    //   oldHead.memory_value*=2
+
+    // let prevWord = oldHead;
+    
+    // for (let i = 0; i < oldHead.memory_value; i++) {
+    //   if (!prevWord.next) {
+    //     break;
+    //   }
+
+    //   prevWord = await LanguageService.getWordById(
+    //     req.app.get('db'),
+    //     prevWord.next
+    //   );
+    //   prevWord = prevWord[0];
+    // }
+    
+    // oldHead.next = prevWord.next;
+    // prevWord.next = oldHead.id;
       
-       await LanguageService.updateLanguageTable(
+      await LanguageService.updateLanguageTable(
         req.app.get('db'),
         req.user.id,
         {
           total_score:Number(totalScore+1),
-          head:newHead.id
+          head:headWord.next
         }
       );
 
@@ -172,15 +189,15 @@ languageRouter
         req.app.get('db'),
         oldHead.id,
         {
-
           memory_value : Number(oldHead.memory_value*2),
           correct_count: Number(oldHead.correct_count+1),
           next: oldHead.next
         }
       )
+
       await LanguageService.updatePrevious(
         req.app.get('db'),
-        prevId,
+        prevWord.id,
         {
           next: prevWord.next,
         }
