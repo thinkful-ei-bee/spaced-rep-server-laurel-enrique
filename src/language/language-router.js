@@ -130,22 +130,21 @@ languageRouter
       
       let oldHead = sll.head.value;
 
+      sll.insertAt(oldHead.memory_value*2, oldHead)
       
       sll.remove(sll.head)
         
       let newHead= sll.head.value
 
-      console.log(newHead,' is the new Head')
 
-      sll.insertAt(oldHead.memory_value*2, oldHead)
+
 
       let newNext =  sll.find(oldHead)
 
       newNext= newNext.next.value.id
       
       oldHead.next = newNext
-      oldHead.correct_count+=1
-      oldHead.memory_value*=2
+     
       let prevWord= ListService.findPrevious(sll, oldHead)
 
       prevWord= prevWord.value
@@ -154,7 +153,7 @@ languageRouter
 
       prevId=prevWord.id
 
-      totalScore +=1
+    
 
   
       // console.log('+++++++++++++++LIST AFTER++++++++++++++++++++++++')
@@ -174,8 +173,8 @@ languageRouter
         oldHead.id,
         {
 
-          memory_value : oldHead.memory_value,
-          correct_count: oldHead.correct_count,
+          memory_value : Number(oldHead.memory_value*2),
+          correct_count: Number(oldHead.correct_count+1),
           next: oldHead.next
         }
       )
@@ -191,7 +190,7 @@ languageRouter
         nextWord:newHead.original,
         answer: oldHead.translation,
         isCorrect,
-        totalScore:Number(totalScore),
+        totalScore:Number(totalScore+1),
         wordCorrectCount:newHead.correct_count,
         wordIncorrectCount:newHead.incorrect_count,
       }
