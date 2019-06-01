@@ -79,14 +79,14 @@ languageRouter
     let guess = req.body.guess
 
     try{
-    //============= validate the req body fields ==================
+    
     if (!guess) {     
       return res.status(400).send({error: `Missing 'guess' in request body`});
     }
 
 
 
-    //============== implement a new LL =======================
+
       let sll = new LinkedList()
       const words = await LanguageService.getLanguageWords(
         req.app.get('db'),
@@ -135,20 +135,12 @@ languageRouter
 
       // sll.insertAt(oldHead.memory_value*2, oldHead)
       // sll.remove(sll.head)
-      
-        
       // let newHead= sll.head.value
-
       // let newNext =  sll.find(oldHead)
-
       // newNext= newNext.next.value.id
-      
-      // oldHead.next = newNext
-     
+      // oldHead.next = newNext     
       // let prevWord= ListService.findPrevious(sll, oldHead)
-
       // prevWord= prevWord.value
-    
       // prevWord.next= oldHead.id
 
       
@@ -161,7 +153,7 @@ languageRouter
 
     let prevWord = oldHead;
     
-    for (let i = 0; i < oldHead.memory_value*2; i++) {
+    for (let i = 0; i <= oldHead.memory_value*2+1; i++) {
       if (!prevWord.next) {
         break;
       }
@@ -207,7 +199,7 @@ languageRouter
         }
       )
 
-      sll.remove(sll.head)
+      sll.remove(sll.head) /////// ???????????/////////
       let newHead= sll.head.value
 
 
@@ -267,7 +259,7 @@ languageRouter
         req.app.get('db'),
         req.user.id,
         {
-          head:newHead.id
+          head:headWord.next
         }
       );
 
@@ -295,7 +287,7 @@ languageRouter
         nextWord:newHead.original,
         wordCorrectCount:newHead.correct_count,
         wordIncorrectCount:newHead.incorrect_count,
-        answer: oldHead.translation,
+        answer: headWord.translation,
         isCorrect,
         totalScore:totalScore
       }
