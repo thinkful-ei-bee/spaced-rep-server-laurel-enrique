@@ -133,23 +133,23 @@ languageRouter
       
       let oldHead = sll.head.value;
 
-      sll.insertAt(oldHead.memory_value*2, oldHead)
-      sll.remove(sll.head)
+      // sll.insertAt(oldHead.memory_value*2, oldHead)
+      // sll.remove(sll.head)
       
         
-      let newHead= sll.head.value
+      // let newHead= sll.head.value
 
-      let newNext =  sll.find(oldHead)
+      // let newNext =  sll.find(oldHead)
 
-      newNext= newNext.next.value.id
+      // newNext= newNext.next.value.id
       
-      oldHead.next = newNext
+      // oldHead.next = newNext
      
-      let prevWord= ListService.findPrevious(sll, oldHead)
+      // let prevWord= ListService.findPrevious(sll, oldHead)
 
-      prevWord= prevWord.value
+      // prevWord= prevWord.value
     
-      prevWord.next= oldHead.id
+      // prevWord.next= oldHead.id
 
       
 
@@ -157,25 +157,29 @@ languageRouter
 
  
 
-    //   oldHead.memory_value*=2
-
-    // let prevWord = oldHead;
     
-    // for (let i = 0; i < oldHead.memory_value; i++) {
-    //   if (!prevWord.next) {
-    //     break;
-    //   }
 
-    //   prevWord = await LanguageService.getWordById(
-    //     req.app.get('db'),
-    //     prevWord.next
-    //   );
-    //   prevWord = prevWord[0];
-    // }
+    let prevWord = oldHead;
     
-    // oldHead.next = prevWord.next;
-    // prevWord.next = oldHead.id;
+    for (let i = 0; i < oldHead.memory_value*2; i++) {
+      if (!prevWord.next) {
+        break;
+      }
+
+      prevWord = await LanguageService.getWordById(
+        req.app.get('db'),
+        prevWord.next
+      );
+      prevWord = prevWord[0];
+    }
+    
+    oldHead.next = prevWord.next;
+    prevWord.next = oldHead.id;
       
+
+
+
+
       await LanguageService.updateLanguageTable(
         req.app.get('db'),
         req.user.id,
@@ -203,9 +207,13 @@ languageRouter
         }
       )
 
+      sll.remove(sll.head)
+      let newHead= sll.head.value
+
+
        response = {
         nextWord:newHead.original,
-        answer: oldHead.translation,
+        answer: headWord.translation,
         isCorrect,
         totalScore:Number(totalScore+1),
         wordCorrectCount:newHead.correct_count,
