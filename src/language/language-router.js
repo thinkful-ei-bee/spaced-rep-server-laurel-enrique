@@ -78,69 +78,62 @@ languageRouter
 
     let guess = req.body.guess
 
-    try{
-    
+    try {
+   
     if (!guess) {     
       return res.status(400).send({error: `Missing 'guess' in request body`});
     }
 
+   
 
-
-
-      let sll = new LinkedList()
-      const words = await LanguageService.getLanguageWords(
-        req.app.get('db'),
-        req.language.id, 
-      )
-
-      // ListService.displayList(sll)
-    
-     for(let i=0; i<words.length; i++){
-       sll.insertLast(words[i])
-     }
-
-     let headWord = await LanguageService.getHeadWord(
+    let headWord = await LanguageService.getHeadWord(
       req.app.get('db'), 
-        req.user.id,
+        req.language.id,
     )
-     headWord=headWord[0]
-     
-     
+      headWord=await headWord;
+     headWord=headWord[0];
+
+
      let totalScore = await LanguageService.getTotalScore(
        req.app.get('db'),
        req.user.id
        );
+       totalScore = await totalScore;
        totalScore = totalScore[0].total_score
   
        
-       
+    let resObj = {
+      answer:headWord.translation
+    }  
     
-      let isCorrect;
     
-      let response = {
-        
-      }
+    
+     
 
-      console.log(guess, sll.head.value.translation)
-      console.log(sll.head,'<---sll.head')
      
     if(guess === headWord.translation){  
         
-          
-        // console.log('+++++++++++++++++LIST BEFORE WITH CORRECT ANSWER ++++++++++++++++++++++')
-        // ListService.displayList(sll)
+      resObj.isCorrect=true
+      resObj.totalScore= totalScore += 1;
 
+      headWord.memory_value *= 2;
+      headWord.correct_count += 1;
+
+    } else{
+      resObj.isCorrect=false;
+      resObj.totalScore = totalScore;
+
+      headWord.memory_value = 1;
+      headWord.incorrect_count += 1;
+    }
       
-      isCorrect =true
-      
-      let oldHead = sll.head.value;
-      let newHead= sll.head.next.value
 
 
-
-    let prevWord = oldHead;
+   
+    let nextHead= headWord.next;
+    let prevWord = headWord;
     
-    for (let i = 0; i <= oldHead.memory_value*2; i++) {
+    for (let i = 0; i < headWord.memory_value; i++) {
       if (!prevWord.next) {
         break;
       }
@@ -150,146 +143,70 @@ languageRouter
         prevWord.next
       );
       prevWord = prevWord[0];
-      oldHead.next = prevWord.next;
-      prevWord.next = oldHead.id;
+      headWord.next = prevWord.next;
+      prevWord.next = headWord.id;
     }
     
       
 
 
 
+    await LanguageService.updateWord(
+      req.app.get('db'),
+      headWord.id,
+      {
+        memory_value : headWord.memory_value,
+        correct_count: headWord.correct_count,
+        incorrect_count:headWord.incorrect_count,
+        next: headWord.next
+      }
+    );
+    await LanguageService.updateWord(
+      req.app.get('db'),
+      prevWord.id,
+      {
+        next: headWord.id,
+      }
+    )
 
       await LanguageService.updateLanguageTable(
         req.app.get('db'),
         req.user.id,
         {
-          total_score:Number(totalScore+1),
-          head:headWord.next
+          total_score:Number(resObj.totalScore),
+          head:nextHead.id
         }
       );
 
-      await LanguageService.updateWord(
-        req.app.get('db'),
-        oldHead.id,
-        {
-          memory_value : Number(oldHead.memory_value*2),
-          correct_count: Number(oldHead.correct_count+1),
-          next: oldHead.next
-        }
-      )
 
-      await LanguageService.updatePrevious(
+      let newHead = await LanguageService.getHeadWord(
         req.app.get('db'),
-        prevWord.id,
-        {
-          next: prevWord.next,
-        }
+        req.language.id
       )
-
+      newHead= await newHead
       
+      newHead = newHead[0]
+
+
+
        response = {
         nextWord:newHead.original,
-        answer: headWord.translation,
-        isCorrect,
-        totalScore:Number(totalScore+1),
         wordCorrectCount:newHead.correct_count,
         wordIncorrectCount:newHead.incorrect_count,
+        answer:resObj.answer,
+        isCorrect:resObj.isCorrect,
+        totalScore:Number(resObj.totalScore),
+
       }
       
-      console.log(response,'<------- response if correct')
+      
 
        res.status(200).json(response)
-        next()
- 
-    } else{
-      
-     
-      // console.log('------------LIST BEFORE WITH WRONG ANSWER ----------------')
-
-      // ListService.displayList(sll)
-      
-      
-   
-      isCorrect=false
-
-      let oldHead = sll.head.value;
-
-      // sll.remove(sll.head)
-
-      
-      let newHead= sll.head.next.value
-      
-      oldHead.next = newHead.next
-      oldHead.incorrect_count+=1
-      // console.log(newHead,' is the new Head')
-
-      newHead.next = oldHead.id
-      sll.insertAt(1, oldHead)
-
-      let prevWord= newHead
-
-      prevWord.next= oldHead.id
-
-      prevId=prevWord.id
-
-  
-
-
-      // console.log('---------------LIST AFTER-------------------')
-      // ListService.displayList(sll)
-
-
-       await LanguageService.updateLanguageTable(
-        req.app.get('db'),
-        req.user.id,
-        {
-          head:headWord.next
-        }
-      );
-
-
-
-      await LanguageService.updateWord(
-        req.app.get('db'),
-          oldHead.id,
-          {
-            memory_value : 1,
-            incorrect_count: oldHead.incorrect_count,
-            next: oldHead.next,
-          }
-      )
-      await LanguageService.updatePrevious(
-        req.app.get('db'),
-        prevId,
-        {
-          next: prevWord.next,
-        }
-      )
-
-    
-      response = {
-        nextWord:newHead.original,
-        wordCorrectCount:newHead.correct_count,
-        wordIncorrectCount:newHead.incorrect_count,
-        answer: headWord.translation,
-        isCorrect,
-        totalScore:totalScore
+       
+       next()
+      } catch (error) {
+        next(error)
       }
-
-     
-       res.status(200).json(response)
-      
-
-        next()
-      
-      
-
-    }
-  } catch (error) {
-    next(error)
-  }
-  
-   
-  })
+    })
 
 module.exports = languageRouter

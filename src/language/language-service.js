@@ -27,7 +27,7 @@ const LanguageService = {
         'incorrect_count',
       )
       .where({ language_id })
-      .orderBy('next')
+   
   },
 
   getWordById(db, id) {
@@ -43,17 +43,12 @@ const LanguageService = {
       .where({id} )
       .update(wordChanges)
   },
-  updatePrevious(db, id, prevChanges) {
-    return db
-      .from('word')
-      .where( {id} )
-      .update(prevChanges)
-  },
 
-  updateLanguageTable(db,user_id , changes){
+
+  updateLanguageTable(db,id , changes){
     return db
       .from ('language')
-      .where('language.user_id', user_id)
+      .where({id})
       .update({
         total_score: changes.total_score,
         head: changes.head
@@ -61,31 +56,16 @@ const LanguageService = {
      
   },
 
-  getHeadWord(db, userId) {
+  getHeadWord(db, languageId) {
     return db
       .from('word')
-      .select(
-        'original',
-        'correct_count',
-        'incorrect_count',
-        'translation',
-        'memory_value',
-        'next',
-        'language_id'
-        )
-      .join('language', 'language.id', '=', 'word.language_id') 
-      .where({ 'language.user_id': userId }) 
-      .where('word.id', '=', db.raw('language.head'))
+      .select('word.*')
+
+      .join('language', 'language.head', '=', 'word.id')
+      .where({ 'language_id': languageId });
 
   },
-  // updateHeadWord(db, userId, next){
-  //   return db
-  //   .from('word')
-  //   .join('language', 'language.id', '=', 'word.language_id') 
-  //   .where({ 'language.user_id': userId }) 
-  //   .where('word.id', '=', db.raw('language.head'))
-  //   .update({'next':next})
-  // },
+
 
   getTotalScore(db, userId) {
     return db
@@ -93,13 +73,7 @@ const LanguageService = {
       .select('total_score')
       .where({'language.user_id': userId })
   },
-  updateTotalScore(db, userId, score) {
-    return db
-      .from('language')
-      .select('total_score')
-      .where({'language.user_id': userId })
-      .update({total_score:score})
-  },
+
 
 
 }
