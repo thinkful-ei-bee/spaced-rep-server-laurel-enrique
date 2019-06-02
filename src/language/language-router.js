@@ -148,9 +148,9 @@ languageRouter
         prevWord.next
       );
       prevWord = prevWord[0];
-      headWord.next = prevWord.next;
-      prevWord.next = headWord.id;
     }
+    headWord.next = prevWord.next;
+    prevWord.next = headWord.id;
     
       
 
