@@ -92,6 +92,8 @@ languageRouter
         req.app.get('db'),
         req.language.id, 
       )
+
+      // ListService.displayList(sll)
     
      for(let i=0; i<words.length; i++){
        sll.insertLast(words[i])
@@ -120,7 +122,7 @@ languageRouter
       }
 
       console.log(guess, sll.head.value.translation)
-      console.log(sll.head)
+      console.log(sll.head,'<---sll.head')
      
     if(guess === headWord.translation){  
         
@@ -132,28 +134,13 @@ languageRouter
       isCorrect =true
       
       let oldHead = sll.head.value;
+      let newHead= sll.head.next.value
 
-      // sll.insertAt(oldHead.memory_value*2, oldHead)
-      // sll.remove(sll.head)
-      // let newHead= sll.head.value
-      // let newNext =  sll.find(oldHead)
-      // newNext= newNext.next.value.id
-      // oldHead.next = newNext     
-      // let prevWord= ListService.findPrevious(sll, oldHead)
-      // prevWord= prevWord.value
-      // prevWord.next= oldHead.id
 
-      
-
-    
-
- 
-
-    
 
     let prevWord = oldHead;
     
-    for (let i = 0; i <= oldHead.memory_value*2+1; i++) {
+    for (let i = 0; i <= oldHead.memory_value*2; i++) {
       if (!prevWord.next) {
         break;
       }
@@ -163,10 +150,10 @@ languageRouter
         prevWord.next
       );
       prevWord = prevWord[0];
+      oldHead.next = prevWord.next;
+      prevWord.next = oldHead.id;
     }
     
-    oldHead.next = prevWord.next;
-    prevWord.next = oldHead.id;
       
 
 
@@ -199,10 +186,7 @@ languageRouter
         }
       )
 
-      sll.remove(sll.head) /////// ???????????/////////
-      let newHead= sll.head.value
-
-
+      
        response = {
         nextWord:newHead.original,
         answer: headWord.translation,
@@ -230,14 +214,14 @@ languageRouter
 
       let oldHead = sll.head.value;
 
-      sll.remove(sll.head)
+      // sll.remove(sll.head)
 
       
-      let newHead= sll.head.value
+      let newHead= sll.head.next.value
       
       oldHead.next = newHead.next
       oldHead.incorrect_count+=1
-      console.log(newHead,' is the new Head')
+      // console.log(newHead,' is the new Head')
 
       newHead.next = oldHead.id
       sll.insertAt(1, oldHead)

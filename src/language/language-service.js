@@ -46,7 +46,7 @@ const LanguageService = {
   updatePrevious(db, id, prevChanges) {
     return db
       .from('word')
-      .where('id', id )
+      .where( {id} )
       .update(prevChanges)
   },
 
