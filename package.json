@@ -1,5 +1,5 @@
 {
-  "name": "express-boilerplate",
+  "name": "spaced-repetition-app",
   "version": "0.0.1",
   "description": "",
   "main": "src/server.js",
@@ -12,7 +12,10 @@
     "deploy": "git push heroku master"
   },
   "keywords": [],
-  "author": "Tom `tomatao` HT <tomht@thinkful.com>",
+  "engines":{
+    "node": "11.12.0"
+  },
+  "author": "Enrique & Laurel",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
