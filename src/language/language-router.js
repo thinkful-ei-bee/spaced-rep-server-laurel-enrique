@@ -90,19 +90,22 @@ languageRouter
       req.app.get('db'), 
         req.language.id,
     )
-      headWord=await headWord;
-     headWord=headWord[0];
+    headWord=await headWord;
+    headWord=headWord[0];
+    console.log('headword:', headWord)
+
 
 
      let totalScore = await LanguageService.getTotalScore(
        req.app.get('db'),
        req.user.id
        );
-       totalScore = await totalScore;
-       totalScore = totalScore[0].total_score
+      totalScore = await totalScore;
+      totalScore = totalScore[0].total_score
   
        
     let resObj = {
+
       answer:headWord.translation
     }  
     
@@ -131,7 +134,9 @@ languageRouter
 
    
     let nextHead= headWord.next;
+
     let prevWord = headWord;
+
     
     for (let i = 0; i < headWord.memory_value; i++) {
       if (!prevWord.next) {
@@ -174,14 +179,14 @@ languageRouter
         req.user.id,
         {
           total_score:Number(resObj.totalScore),
-          head:nextHead.id
+          head:nextHead
         }
       );
 
 
       let newHead = await LanguageService.getHeadWord(
         req.app.get('db'),
-        req.language.id
+        req.user.id
       )
       newHead= await newHead
       
