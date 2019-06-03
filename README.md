@@ -18,7 +18,7 @@ Response contains the following:
  nextWord: the untranslated word the user will be tested on,
  wordCorrectCount: number of user's correct attempts on respective word, 
  wordIncorrectCount:number of user's incorrect attempts on respective word, 
- totalScore: user's total correct answers for all words in that
+ totalScore: user's total correct answers for all words in that language
 
 ### POST /api/language/guess
 Request body for this route requires a key, "guess",  whose value is the user's guess for the word in question
@@ -29,7 +29,7 @@ isCorrect: returns true or false depending on the user's answer
 nextWord: next untranslated word to be tested
 wordCorrectCount: number of user's correct attempts on respective word, 
 wordIncorrectCount:number of user's incorrect attempts on respective word, 
-totalScore: user's total correct answers for all words in that
+totalScore: user's total correct answers for all words in that language
 
 
 ## Scripts
