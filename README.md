@@ -1,42 +1,36 @@
 # Spaced repetition API!
 
-## Local dev setup
+This is the server side for the spaced repetition project by Laurel Butler and Enrique Montemayor and utilizes Express and PostgresSQL. 
 
-If using user `dunder-mifflin`:
+## API Documentation
 
-```bash
-mv example.env .env
-createdb -U dunder-mifflin spaced-repetition
-createdb -U dunder-mifflin spaced-repetition-test
-```
+### GET /api/language
+Returns data for the current user. Returns "language" with keys of "id", "name," "total_score", "user_id", and "head." The name is the name of the language, "head" points to the head of the linked list of words for the user to practice. Total score is the number of correct answers the user has made.
 
-If your `dunder-mifflin` user has a password be sure to set it in `.env` for all appropriate fields. Or if using a different user, update appropriately.
+Also returns "words" with a list of the users words, each having the keys "id", "original," "translation," "memory_value", "correct_count", "incorrect_count", "language_id", and "next."
 
-```bash
-npm install
-npm run migrate
-env MIGRATION_DB_NAME=spaced-repetition-test npm run migrate
-```
+"Memory value" is used to ensure that words that have been answered correctly multiple times are tested less frequently, while the correct and incorrect counts are the number of times the user has guessed correctly or incorrectly. "Next" points to the next word on the linked list.
 
-And `npm test` should work at this point
+### GET /api/language/head
+Returns the next word the user will be tested on. Contains the keys:
 
-## Configuring Postgres
+Response contains the following:
+ nextWord: the untranslated word the user will be tested on,
+ wordCorrectCount: number of user's correct attempts on respective word, 
+ wordIncorrectCount:number of user's incorrect attempts on respective word, 
+ totalScore: user's total correct answers for all words in that
 
-For tests involving time to run properly, configure your Postgres database to run in the UTC timezone.
+### POST /api/language/guess
+Request body for this route requires a key, "guess",  whose value is the user's guess for the word in question
 
-1. Locate the `postgresql.conf` file for your Postgres installation.
-   1. E.g. for an OS X, Homebrew install: `/usr/local/var/postgres/postgresql.conf`
-   2. E.g. on Windows, _maybe_: `C:\Program Files\PostgreSQL\11.2\data\postgresql.conf`
-2. Find the `timezone` line and set it to `UTC`:
+Response contains the following:
+answer: correct translation of word the user attempted a guess on
+isCorrect: returns true or false depending on the user's answer
+nextWord: next untranslated word to be tested
+wordCorrectCount: number of user's correct attempts on respective word, 
+wordIncorrectCount:number of user's incorrect attempts on respective word, 
+totalScore: user's total correct answers for all words in that
 
-```conf
-# - Locale and Formatting -
-
-datestyle = 'iso, mdy'
-#intervalstyle = 'postgres'
-timezone = 'UTC'
-#timezone_abbreviations = 'Default'     # Select the set of available time zone
-```
 
 ## Scripts
 
